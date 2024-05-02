@@ -1,0 +1,181 @@
+---
+title: "401_HW11"
+author: "Sylvia"
+date: "12/1/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+qt(1-0.05/6, 17)
+```
+
+
+```{r}
+Calrain <- read.csv("Calrain.csv", header = T)
+head(Calrain)
+```
+
+Univariate Distribution
+```{r}
+par(mfrow = c(2,2))
+hist(Calrain$Rainfall)
+hist(log(Calrain$Rainfall))
+hist(Calrain$Altitude)
+hist(sqrt(Calrain$Altitude))
+hist(Calrain$Latitude)
+hist(Calrain$Distance)
+```
+
+Add variables
+```{r}
+Calrain$log.rainfall = log(Calrain$Rainfall)
+Calrain$cr.altitude = (Calrain$Altitude)^(1/3)
+Calrain$cr.altitude
+```
+
+
+
+Bivariate Distribution
+
+```{r}
+pairs(log.ainfall~Altitude+Latitude+Distance+Shadow, data = Calrain, lower.panel = NULL)
+pairs(sqrt(Rainfall)~Altitude+Latitude+Distance+Shadow, data = Calrain, lower.panel = NULL)
+```
+
+Full Model
+
+
+```{r}
+M1 <- lm(log.rainfall~Altitude+Latitude+Distance+Shadow, data = Calrain)
+summary(M1)
+vif(M1)
+AIC(M1)
+BIC(M1)
+PRESS.M1 <- mean((resid(M1)/(1-hatvalues(M1)))^2)
+PRESS.M1
+```
+
+
+
+
+Residual of M1
+```{r}
+plot(x = fitted(M1), # fitted values on x axis
+     y = residuals(M1), # residuals on y axis
+     xlab = "Fitted", # x label
+     ylab = "Residuals", # y label
+     main = "Residuals vs Fitted" # title label
+)
+abline(h = 0) # draw a horizontal line at 0
+
+y.hat1 <- fitted(M1)
+ep.hat1 <- resid(M1)
+plot(y.hat1, ep.hat1, main = "Residual Plot", ylab = "Residuals", xlab = "y-hat")
+abline(h=0, lty = 5)
+lines(lowess(ep.hat1~y.hat1, f = 8/10, iter = 3), lty = 1)
+
+boxplot(ep.hat1, main = "Boxplot: Residuals")
+qqnorm(ep.hat1, main = "Nomral Q-Q plot for residuals")
+qqline(ep.hat1)
+```
+
+
+M2 with interaction
+
+```{r}
+M2 <- lm(log.rainfall~Altitude+Latitude+Distance+Shadow+Altitude:Latitude+Altitude:Distance+Altitude:Shadow+Latitude:Distance+Latitude:Shadow+Distance:Shadow, data = Calrain)
+
+summary(M2)
+vif(M2)
+
+PRESS.M2 <- mean((resid(M2)/(1-hatvalues(M2)))^2)
+PRESS.M2
+```
+
+```{r}
+anova(M1, M2)
+```
+
+
+```{r}
+AIC(M2)
+BIC(M2)
+```
+
+
+
+
+
+```{r}
+M3 <- lm(log.rainfall~Altitude +Latitude+Distance+Shadow+Altitude:Latitude+Altitude:Shadow, data = Calrain)
+summary(M3)
+vif(M3)
+```
+
+```{r}
+anova(M1, M3)
+```
+
+```{r}
+AIC(M3)
+BIC(M3)
+PRESS.M3 <- mean((resid(M3)/(1-hatvalues(M3)))^2)
+PRESS.M3
+```
+
+```{r}
+M4 <- lm(log.rainfall~Altitude +Latitude+Distance+Shadow+Altitude:Shadow, data = Calrain)
+summary(M4)
+vif(M4)
+```
+
+```{r}
+anova(M1, M4)
+```
+
+```{r}
+AIC(M4)
+BIC(M4)
+PRESS.M4 <- mean((resid(M4)/(1-hatvalues(M4)))^2)
+PRESS.M4
+```
+
+```{r}
+y.hat4 <- fitted(M4)
+ep.hat4 <- resid(M4)
+plot(y.hat4, ep.hat4, main = "Residual Plot", ylab = "Residuals", xlab = "y-hat")
+abline(h=0, lty = 5)
+lines(lowess(ep.hat4~y.hat4, f = 8/10, iter = 3), lty = 1)
+
+boxplot(ep.hat4, main = "Boxplot: Residuals")
+qqnorm(ep.hat4, main = "Nomral Q-Q plot for residuals")
+qqline(ep.hat4)
+```
+
+```{r}
+M.CI <- lm(log.rainfall~Altitude+Latitude+Distance+factor(Shadow), data = Calrain)
+summary(M.CI)
+confint(M.CI)
+confint(M1)
+```
+
+
+```{r}
+confint(M4)
+```
+
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

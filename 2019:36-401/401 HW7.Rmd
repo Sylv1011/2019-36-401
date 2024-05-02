@@ -1,0 +1,58 @@
+---
+title: "HW7 401"
+author: "Sylvia"
+date: "10/23/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+rate = read.table("LOS.txt", header = T)
+#head(rate)
+
+attach(rate)
+```
+**Fit Model**
+```{r}
+pairs(~log(LOS) + Inf.Risk + Age + No.Beds, data=rate, lower.panel = NULL)
+```
+
+a
+
+a
+a
+aa
+a
+
+a
+
+```{r}
+model <- lm(log(LOS)~Inf.Risk + Age, data = rate)
+summary(model)
+```
+```{r}
+par(mfrow = c(2,2))
+y.hat.log <- fitted(model)
+ep.hat.log <- resid(model)
+plot(y.hat.log, ep.hat.log, main = "Residual Plot", ylab = "Residuals", xlab = "y-hat")
+abline(h=0, lty = 5)
+
+plot(log(rate$LOS), y.hat.log, main = "y-hat vs y", xlab = "log(LOS)", ylab = "y-hat")
+boxplot(ep.hat.log)
+qqnorm(ep.hat.log)
+```
+
+```{r}
+round(confint(model, level = 0.95), digits = 5)
+```

@@ -1,0 +1,102 @@
+---
+title: "401 HW9"
+author: "Sylvia"
+date: "11/16/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Problem #1
+
+(a)
+```{r}
+Rpdata <- read.csv("Rpdata.csv", header = TRUE)
+head(Rpdata)
+pairs(~y+x1+x2+x3+x4+x5+x6, data = Rpdata, lower.panel = NULL)
+```
+ (b)
+ 
+```{r}
+model.full <- lm(y~x1+x2+x3+x4+x5+x6, data = Rpdata)
+summary(model.full)
+```
+ 
+(c)
+
+Residual vs Fitted Value
+
+```{r}
+y.hat <- fitted(model.full)
+ep.hat <- resid(model.full)
+plot(y.hat, ep.hat, main = "Residual Plot", ylab = "Residuals", xlab = "y-hat")
+abline(h=0, lty = 5)
+```
+
+Problem #3
+
+(a)
+```{r}
+Fuel2001 <- read.csv("Fuel2001.csv", header = TRUE)
+
+Fuel2001$Dlic = (Fuel2001$Drivers/Fuel2001$Pop)*1000
+Fuel2001$Fuel = (Fuel2001$FuelC/Fuel2001$Pop)*1000
+Fuel2001$log.miles = log(Fuel2001$Miles)
+
+head(Fuel2001)
+```
+
+(b)
+
+```{r}
+pairs(~Fuel+Tax+Dlic+Income+log.miles, data = Fuel2001, lower.panel = NULL)
+```
+
+(c)
+
+```{r}
+model <- lm(Fuel~Tax+Dlic+Income+log.miles, data = Fuel2001)
+summary(model)
+```
+
+(d)
+
+```{r}
+y.hat1 <- fitted(model)
+ep.hat1 <- resid(model)
+plot(y.hat1, ep.hat1, main = "Residual Plot", ylab = "Residuals", xlab = "y-hat")
+abline(h=0, lty = 5)
+qqnorm(ep.hat1)
+qqline(ep.hat1)
+```
+
+(e)
+
+```{r}
+plot(hatvalues(model), main = "hii vs index")
+plot(rstudent(model), main = "student.res vs index")
+plot(cooks.distance(model), main = "Cook's D vs index")
+```
+
+```{r}
+rownames(Fuel2001) <- Fuel2001$State
+case.analysis <- cbind(rownames(Fuel2001), rstudent(model), cooks.distance(model))
+case.analysis
+F.50 <- qf(0.5, 5, 46)
+which(case.analysis[,3] > F.50)
+```
+
+(f) 
+
+```{r}
+model.reduced <- lm(Fuel~Dlic+log.miles, data = Fuel2001)
+anova(model.reduced)
+anova(model)
+```
+
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

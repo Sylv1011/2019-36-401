@@ -1,0 +1,142 @@
+---
+title: "36401 HW4"
+author: "Sylvia"
+date: "9/23/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Part A
+
+```{r}
+BloodLevel = read.table("BloodLevel.dat",header = TRUE)
+```
+
+(a)
+(1)
+**EDA**
+
+```{r}
+plot(BloodLevel$Level~BloodLevel$Age, main = "Loess plot: Age vs Level", xlab = "Age", ylab = "Level")
+lines(lowess(BloodLevel$Level~BloodLevel$Age, f = 8/10), lty = 2)
+```
+
+The trend seems to be like as Age increases for infants, the levels of hormone in the blood decreases. In other words, as x increases, y decreases. Currently from the graph, it is hard to tell if there is any outlier. Also the variability of Y seems to decrease as X increases as well. 
+
+
+(2)
+**Simple Linear Regression Line**
+
+```{r}
+plot(BloodLevel$Level~BloodLevel$Age, main = "Loess plot: Age vs Level", xlab = "Age", ylab = "Level")
+lines(lowess(BloodLevel$Level~BloodLevel$Age, f = 8/10), lty = 2)
+abline(lm(BloodLevel$Level~BloodLevel$Age), lty = 1)
+```
+
+(3)
+
+**Assessing fit of model**
+
+```{r}
+lm(BloodLevel$Level~BloodLevel$Age)
+```
+
+The model seems to be a decent fit of the data, because here the R^2 value is 0.6672, which is realatively high in the range of [0,1], which means the proportion of variation in Y explained by the linear regression model is about 66%. 
+
+**Residual Analysis**
+
+```{r}
+y.hat <- fitted(lm(BloodLevel$Level~BloodLevel$Age))
+ep.hat <- resid(lm(BloodLevel$Level~BloodLevel$Age))
+plot(y.hat, ep.hat, main = "Residual Plot", ylab = "Residuals", xlab = "y-hat")
+abline(h=0, lty = 5)
+lines(lowess(ep.hat~y.hat, f = 8/10, iter = 3), lty = 1)
+#legend(locator(n=1), legend=c("loess"), lty = 1)
+```
+
+**Normality**
+
+```{r}
+boxplot(ep.hat, main = "Boxplot: Residuals")
+qqnorm(ep.hat, main = "Nomral Q-Q plot for residuals")
+qqline(ep.hat)
+```
+
+(4) 
+**Test Significant Relationship**
+```{r}
+summary(lm(BloodLevel$Level~BloodLevel$Age))
+```
+
+Null Hypothesis: beta1 = 0, Alternative hypothesis: beta one != 0. The linear relaionship is significant because from the data we have, we can calculate the critical value of this T distribution. Since the estimated beta1 from above is -2.1096 and SE of estimated beta1 is 0.3106, t* = (-2.1096-0)/0.3106 = -6.792, and since the value is less than -t(1-alpha/2, df), which is 2.069, we reject the null hypothesis and conclude there is a statistically significant linear relationship between the two variables.
+ 
+
+(b) Result: From the analysis, we see that there is a negative correlation between the variable Age and Level, and the linear relationship is significant because the p value less than 0.05. After fitting a linear regression line, we have a model that has Intercept 13.258 and slope -2.1096, so we can predict the bloodlevel from age by the equation y = 13.258-2.1096t. From residual analysis, we can see that the residuals do not seem to be standard normally distributed and the normal Q-Q plot also indicates that there are outlier for the residual. Thus, we consider this model not really a good fit for the data. Also the QQ plot indicates normality assumption is violated here as well. Lastly, since we reject the null hypothesis that beta1 = 0 based on statistics given, we are confident that there is some negative correlation existent between variables age and level. 
+
+##Part B
+(c)
+Because the variabilities of residuals are not constant, and by looking at the concaved up feature of the lowess line, Level seems need a log transformation so that the trend can be corrected. 
+
+(d)
+
+(1)
+**EDA**
+
+```{r}
+log.level <- log(BloodLevel$Level)
+plot(log.level~BloodLevel$Age, main = "Loess plot: Age vs log(Level)", xlab = "Age", ylab = "log(Level)")
+lines(lowess(log.level~BloodLevel$Age, f = 8/10), lty = 2)
+```
+
+(2)
+**Simple Linear Regression Line**
+
+```{r}
+plot(log.level~BloodLevel$Age, main = "Loess plot: Age vs log(Level)", xlab = "Age", ylab = "log(Level)")
+lines(lowess(log.level~BloodLevel$Age, f = 8/10), lty = 2)
+abline(lm(log.level~BloodLevel$Age), lty = 1)
+```
+
+(3)
+
+**Assessing fit of model**
+
+```{r}
+lm(log.level~BloodLevel$Age)
+```
+
+**Residual Analysis**
+
+```{r}
+y.hat1 <- fitted(lm(log.level~BloodLevel$Age))
+ep.hat1 <- resid(lm(log.level~BloodLevel$Age))
+plot(y.hat1, ep.hat1, main = "Residual Plot", ylab = "Residuals", xlab = "y-hat new")
+abline(h=0, lty = 5)
+lines(lowess(ep.hat1~y.hat1, f = 8/10, iter = 3), lty = 1)
+#legend(locator(n=1), legend=c("loess"), lty = 1)
+```
+
+**Normality**
+
+```{r}
+boxplot(ep.hat1, main = "Boxplot: Residuals")
+qqnorm(ep.hat1, main = "Nomral Q-Q plot for residuals")
+qqline(ep.hat1)
+```
+
+(4)
+**Test Significant Relationship**
+```{r}
+summary(lm(log.level~BloodLevel$Age))
+```
+
+Null Hypothesis: beta1 = 0; Alternative Hypothesis: beta1 != 0, alpha = 0.05
+Again, the relationship is significant because from the data we have, we can calculate the critical value of this T distribution. The estimated beta1 in this case is -0.22740 and SE of estimated beta1 is 0.02651, t* = (-0.22740-0)/0.02651 = -8.577, and since the value is less than -t(1-alpha/2, df) again (2.069), we reject the null hypothesis and conclude there is a statistically significant linear relationship between the two variables.
+ 
+
+e) From the first set of graphs, we see that the lowess line is not as curved as the last part, also the lowess curve aligned more with the linera model. Moreoever, we can tell that now the residuals are more normally distributed from the residual plot. Lastly, R^2 for the second analysis is about 75%, which is higher than the first analysis, which is about 66%. 

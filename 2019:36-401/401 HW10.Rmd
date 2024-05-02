@@ -1,0 +1,69 @@
+---
+title: "401 HW10"
+author: "Sylvia"
+date: "11/20/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+Problem 2
+(a)
+```{r}
+sbp <- read.csv("SBP.csv")
+head(sbp)
+pairs(~SBP+BMI+Age+Smoke, data = sbp, lower.panel = NULL)
+```
+
+(b)
+```{r}
+round(cor(sbp), 3)
+round(cor(sbp)[-1,-1], 3)
+```
+
+```{r}
+full.mod <- lm(SBP~Age+BMI+Smoke+Age:Smoke+BMI:Smoke, data = sbp)
+summary(full.mod)
+```
+
+(d)
+
+```{r}
+model.noint <- lm(SBP~Age+BMI+Smoke, data = sbp)
+summary(model.noint)
+```
+
+
+(d)
+
+```{r}
+model.noint <- lm(SBP~Age+BMI+Smoke, data = sbp)
+summary(model.noint)
+```
+
+(e)
+
+```{r}
+anova(full.mod, model.noint)
+```
+
+(f)
+
+```{r}
+mode.smoke <- lm(SBP~Smoke, data = sbp)
+summary(mode.smoke)
+```
+
+(g)
+```{r}
+anova(model.noint, mode.smoke)
+```
+
+```{r}
+M4 <- lm(SBP~Age+BMI, data = sbp)
+anova(model.noint, M4)
+```
+

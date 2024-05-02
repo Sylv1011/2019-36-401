@@ -1,0 +1,103 @@
+---
+title: "36401_HW5"
+author: "Sylvia"
+date: "10/8/2019"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+Homicide <- read.table("Homicide_sample.txt", header = TRUE)
+```
+
+```{r}
+hist(Homicide$family.pov)
+boxplot(Homicide$family.pov)
+
+hist(Homicide$homicide.rate)
+boxplot(Homicide$homicide.rate)
+
+hist(log(Homicide$homicide.rate))
+boxplot(log(Homicide$homicide.rate))
+```
+
+```{r}
+#Original
+
+plot(Homicide$homicide.rate~Homicide$family.pov, main = "Loess plot: Family Poverty Rate vs Homicide Rate", xlab = "Family Poverty Rate", ylab = "Homicide Rate")
+lines(lowess(Homicide$homicide.rate~Homicide$family.pov, f = 8/10), lty = 2)
+abline(lm(Homicide$homicide.rate~Homicide$family.pov), lty = 1)
+
+y.hat1 <- fitted(lm(Homicide$homicide.rate~Homicide$family.pov))
+ep.hat1 <- resid(lm(Homicide$homicide.rate~Homicide$family.pov))
+plot(y.hat1, ep.hat1, main = "Residual Plot", ylab = "Residuals", xlab = "y-hat")
+abline(h=0, lty = 5)
+lines(lowess(ep.hat1~y.hat1, f = 8/10, iter = 3), lty = 1)
+
+summary(lm(Homicide$homicide.rate~Homicide$family.pov))
+```
+
+```{r}
+boxplot(ep.hat1, main = "Boxplot: Residuals")
+qqnorm(ep.hat1, main = "Nomral Q-Q plot for residuals")
+qqline(ep.hat1)
+```
+
+```{r}
+#log both
+plot(log(Homicide$homicide.rate)~log(Homicide$family.pov), main = "Loess plot: Family Poverty Rate vs Homicide Rate", xlab = "Family Poverty Rate", ylab = "Homicide Rate")
+lines(lowess(log(Homicide$homicide.rate)~log(Homicide$family.pov), f = 8/10), lty = 2)
+abline(lm(log(Homicide$homicide.rate)~log(Homicide$family.pov)), lty = 1)
+
+y.hat2 <- fitted(lm(log(Homicide$homicide.rate)~log(Homicide$family.pov)))
+ep.hat2 <- resid(lm(log(Homicide$homicide.rate)~log(Homicide$family.pov)))
+plot(y.hat2, ep.hat2, main = "Residual Plot", ylab = "Residuals", xlab = "y-hat")
+abline(h=0, lty = 5)
+lines(lowess(ep.hat2~y.hat2, f = 8/10, iter = 3), lty = 1)
+
+summary(lm(log(Homicide$homicide.rate)~log(Homicide$family.pov)))
+```
+```{r}
+boxplot(ep.hat2, main = "Boxplot: Residuals")
+qqnorm(ep.hat2, main = "Nomral Q-Q plot for residuals")
+qqline(ep.hat2)
+```
+
+
+```{r}
+plot(log(Homicide$homicide.rate)~Homicide$family.pov, main = "Loess plot: Family Poverty Rate vs Homicide Rate", xlab = "Family Poverty Rate", ylab = "Homicide Rate")
+lines(lowess(log(Homicide$homicide.rate)~Homicide$family.pov, f = 8/10), lty = 2)
+abline(lm(log(Homicide$homicide.rate)~Homicide$family.pov), lty = 1)
+
+y.hat3 <- fitted(lm(log(Homicide$homicide.rate)~Homicide$family.pov))
+ep.hat3 <- resid(lm(log(Homicide$homicide.rate)~Homicide$family.pov))
+plot(y.hat3, ep.hat3, main = "Residual Plot", ylab = "Residuals", xlab = "y-hat")
+abline(h=0, lty = 5)
+lines(lowess(ep.hat3~y.hat3, f = 8/10, iter = 3), lty = 1)
+
+summary(lm(log(Homicide$homicide.rate)~Homicide$family.pov))
+```
+
+```{r}
+par(mfrow = c(1,2))
+boxplot(ep.hat3, main = "Boxplot: Residuals")
+qqnorm(ep.hat3, main = "Nomral Q-Q plot for residuals")
+qqline(ep.hat3)
+```
+
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
